@@ -22,7 +22,7 @@ router.get('/',async(ctx,next)=>{
 const app = new Koa();
 app.use(bodyparser())
 app.use(router.routes())
-app.use(home.routes)
+app.use(home.routes())
 app.use(cors({
     exposeHeaders: ['WWW-Authenticate', 'Server-Authorization', 'Date'],
     maxAge: 100,
@@ -31,6 +31,6 @@ app.use(cors({
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Custom-Header', 'anonymous'],
 }));
 
-app.listen(9999,()=>{
-    console.log('port is at 9999')
+app.listen(6446,()=>{
+    console.log('port is at 6446')
 })
