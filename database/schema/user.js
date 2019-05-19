@@ -1,21 +1,34 @@
 const mongoose = require('mongoose');
 import crypto from "crypto"
+import { resolve, reject } from "_any-promise@1.3.0@any-promise";
 const userSchema = new mongoose.Schema({
-    userName : {unique:true,type:String},
+    userName : String,
     password : String,
     createAt : {type:Date,default:Date.now()},
     lastLoginAt : {type:Date,default:Date.now()},
-    userType : {type:Number,fefault:10001}
+    userType : {type:Number,default:10001},
+    phone:String
 },{
     collection:'user'
 })
 const md5 = (str)=>crypto.createHash('md5').update(str.toString()).digest("hex")
-// userSchema.pre('save',function(next){
-//     this.password = md5(this.password)
-// })
+
+userSchema.pre('save',function(next){
+    this.password = md5(this.password)
+    next();
+})
 userSchema.methods={
-    comparePassword:(_password,password)=>{
-        return isMatch = md5(_password)===password?true:false;
+    comparePassword:(_password,passwords)=>{
+        return new Promise((resolve,reject)=>{
+            passwords.forEach(element => {
+                if (md5(_password)===element.password){
+                    resolve(element);
+                    return
+                }
+            });
+            reject('匹配失败');
+
+        })
     }
 }
 

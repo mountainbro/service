@@ -13,35 +13,35 @@ router.get('/json', async (ctx, next) => {
     title: 'koa2 json'
   }
 })
-router.post('/register',async(ctx)=>{
-   console.log(ctx.request.body)
+router.post('/register', async (ctx) => {
   const User = mongoose.model('User')
   let newUser = new User(ctx.request.body)
-  console.log(newUser)
-  await newUser.save().then(()=>{
-      ctx.body={
-          code:200,
-          message:'注册成功'
-      }
-  }).catch(error=>{
-      ctx.body={
-          code:500,
-          message:error
-      }
+  await newUser.save().then(() => {
+    ctx.body = {
+      code: 200,
+      message: '注册成功'
+    }
+  }).catch(error => {
+    ctx.body = {
+      code: 500,
+      message: error
+    }
   })
 })
-router.post('/login', async (ctx, next) => {
-  let name, password, phone;
-  ({ name, password, phone } = ctx.request.body)
-  const User = mongoose.model('User');
-  await User.findOne({ userName: name }).exec().then(async (result) => {
 
-    console.log('in _____',result)
+router.post('/login', async (ctx, next) => {
+  let userName, password, phone;
+  ({ userName, password, phone } = ctx.request.body)
+  const User = mongoose.model('User');
+  await User.find({ userName: userName }).exec().then(async (result) => {
     if (result) {
       let newUser = new User()
-      await newUser.comparePassword(password, result.password)
+      await newUser.comparePassword(password, result)
         .then(isMatch => {
-          ctx.body = { code: 200, message: isMatch }
+          let userType,id,phone;
+          ({userType,id,phone} = isMatch)
+          ctx.body = { code: 200, userType,id,phone}
+          User.updateOne({userName:userName},{lastLoginAt:Date.now()}).exec();
         })
         .catch(error => {
           console.log(error)
@@ -55,14 +55,6 @@ router.post('/login', async (ctx, next) => {
     ctx.body = { code: 500, message: error }
   })
 
-  ctx.body = "register login demo"
-})
-router.get('/register', async (ctx, next) => {
-  console.log(1);
-  ctx.body = "register get demo"
-  // const User = mongoose.model('User');
-  // ({name,password,phone}=ctx.body)
-  // console.log(name,password,phone)
 })
 
 // module.exports = router
