@@ -3,26 +3,17 @@ const Router = require('koa-router');
 const cors = require('koa2-cors')
 const {initSchema,connect} = require('./database/init');
 const bodyparser = require('koa-bodyparser');
-import home from './controller/';
+import router from './controller/';
+const check = require('./middware/token_judge')
 
-
-
-
-const router = new Router({
-    prefix:'/api'
-})
 ;(async()=>{
     await connect();
     initSchema();
 })()
 
-router.get('/',async(ctx,next)=>{
-    ctx.body="haha"
-})
 const app = new Koa();
-app.use(bodyparser())
-app.use(router.routes())
-app.use(home.routes())
+
+
 app.use(cors({
     exposeHeaders: ['WWW-Authenticate', 'Server-Authorization', 'Date'],
     maxAge: 100,
@@ -30,6 +21,8 @@ app.use(cors({
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Custom-Header', 'anonymous'],
 }));
+
+app.use(bodyparser()).use(check).use(router.routes())
 
 app.listen(6446,()=>{
     console.log('port is at 6446')
