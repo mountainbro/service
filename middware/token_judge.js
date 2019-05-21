@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');  //用来生成token
 
 async function check(ctx,next){
     let url = ctx.request.url;
-    if (url == "/login") {
+    let pageArr = ["/login","/register"];
+    if (pageArr.includes(url)) {
         await next()
         return
     };
