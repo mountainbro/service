@@ -1,8 +1,23 @@
 const router = require('koa-router')()
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
+const qiniu = require('qiniu')
+
 router.get('/', async (ctx, next) => {
   ctx.body = "Hello"
+})
+
+router.get('/qiniuToken',async(ctx)=>{
+  var accessKey = 'BYzCKUDMoPirtnxd-pEEE4lRdPcnsS-vgc2l0jmL';
+  var secretKey = 'IwtT9Hi6v58D2mc1YlV2karuV3XilawgmWVgRAOa';
+  var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+  //自定义凭证有效期（示例2小时，expires单位为秒，为上传凭证的有效时间）
+  var options = {
+    scope: bucket,
+    expires: 7200
+  };
+  var putPolicy = new qiniu.rs.PutPolicy(options);
+  var uploadToken=putPolicy.uploadToken(mac);
 })
 
 router.post('/register', async (ctx) => {
