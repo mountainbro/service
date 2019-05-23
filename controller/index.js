@@ -13,11 +13,18 @@ router.get('/qiniuToken',async(ctx)=>{
   var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
   //自定义凭证有效期（示例2小时，expires单位为秒，为上传凭证的有效时间）
   var options = {
-    scope: bucket,
-    expires: 7200
+    scope: 'moshi-yushan-public-bucket',
+    expires: 7200,
+    callbackBody: '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)","name":"$(x:name)","code":200}',
+    callbackBodyType: 'application/json'
   };
   var putPolicy = new qiniu.rs.PutPolicy(options);
-  var uploadToken=putPolicy.uploadToken(mac);
+  var uploadToken=await putPolicy.uploadToken(mac);
+  ctx.body = {
+    code:200,
+    message:'success',
+    qiniuToken:uploadToken
+  }
 })
 
 router.post('/register', async (ctx) => {

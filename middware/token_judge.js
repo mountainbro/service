@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');  //用来生成token
 
 async function check(ctx,next){
     let url = ctx.request.url;
-    let pageArr = ["/login","/register"];
+    let pageArr = ["/login","/register","/qiniuToken"];
     if (pageArr.includes(url)) {
         await next()
         return
