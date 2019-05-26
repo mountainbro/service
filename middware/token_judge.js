@@ -2,12 +2,15 @@
 const jwt = require('jsonwebtoken');  //用来生成token
 
 async function check(ctx,next){
-    let url = ctx.request.url;
-    let pageArr = ["/login","/register","/qiniuToken"];
+    let url = ctx.url.match(/\/(\w)*\?/);
+    url = url?url[0].slice(0,-1):ctx.request.url;
+    let pageArr = ["/login","/register","/qiniuToken","/addType","/"];
     if (pageArr.includes(url)) {
+        console.log('不用权限')
         await next()
         return
     };
+    console.log('没有token',url);
     // let token = ctx.request.headers["authorization"];
     // jwt.verify(token,'salt',async(err,decode)=>{
     //     if (err){

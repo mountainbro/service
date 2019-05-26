@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
-const categorySchema = new mongoose.Schema({
-    name:String,
+const typeSchema = new mongoose.Schema({
+    typeName:String,
     createAt:{type:Date, default:Date.now()},
     updateAt : {type:Date,default:Date.now()},
 },{
-    collection:'category'
+    collection:'type'
 })
-mongoose.model('category',categorySchema)
+
+mongoose.model('type',typeSchema)
