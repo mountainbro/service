@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const typeSchema = new mongoose.Schema({
-    typeName:String,
+    name:String,
     createAt:{type:Date, default:Date.now()},
     updateAt : {type:Date,default:Date.now()},
 },{

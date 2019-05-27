@@ -3,7 +3,8 @@ const Router = require('koa-router');
 const cors = require('koa2-cors')
 const {initSchema,connect} = require('./database/init');
 const bodyparser = require('koa-bodyparser');
-import router from './controller/';
+const staticPath = require('koa-static');
+import router1 from './router';
 const check = require('./middware/token_judge')
 
 ;(async()=>{
@@ -12,7 +13,7 @@ const check = require('./middware/token_judge')
 })()
 
 const app = new Koa();
-
+app.use(staticPath(__dirname + "/public"));
 
 app.use(cors({
     exposeHeaders: ['WWW-Authenticate', 'Server-Authorization', 'Date'],
@@ -22,7 +23,7 @@ app.use(cors({
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Custom-Header', 'anonymous'],
 }));
 
-app.use(bodyparser()).use(check).use(router.routes())
+app.use(bodyparser()).use(router1())
 
 app.listen(6446,()=>{
     console.log('port is at 6446')
