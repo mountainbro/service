@@ -39,15 +39,31 @@ const add = async function (ctx, collection) {
 }
 const search = async(ctx,collection)=>{
   const coll = mongoose.model(collection);
-  let name = ctx.query.name || '';
-  var reg = new RegExp(name, 'i')
-  let data = await coll.find({ name: { '$regex': reg } }, { __v: 0 });
+  let name,sort,page,size;
+  let total = coll.find().count();
+  ({name='',sort='_id',page=1,size=3}=ctx.query)
+  var reg = new RegExp(name, 'i');
+  let hasNext = (total - size*page)>0?true:false;
+  let condition = collection == 'article'? { }:{ name: { '$regex': reg } };
+  let options = collection == 'article'?{ "limit":size,"skip":(page-1)*size}:{ __v: 0 };
+  console.log(options)
+  let data = await coll.find({},options).sort({'_id':-1});
   if (data.length>0) {
-    return {
+    let response = {
       code: 200,
       data,
       msg: 'success'
-    }
+    };
+    // if (collection == 'article'){
+    //   response = Object.assign(
+    //     response
+    //     ,{
+    //       hasNext,
+    //       total
+    //     }
+    //   )
+    // }
+    return response
   } else {
     return {
       code: 410,
@@ -59,27 +75,57 @@ const search = async(ctx,collection)=>{
 
 //接口
 const addType = async (ctx, next) => {
-  let body = await add(ctx, 'type');
-  ctx.body = body;
+  ctx.body = await add(ctx, 'type');
+}
+
+const typeList = async (ctx, next) => {
+  ctx.body = await search(ctx,'type')
 }
 const addTag = async(ctx,next)=>{
-  let data = await add(ctx,'tag');
-  ctx.body = data;
-}
-const typeList = async (ctx, next) => {
-  let data = await search(ctx,'type')
-  ctx.body = data;
+  ctx.body = await add(ctx,'tag');
 }
 const tagList = async (ctx, next) => {
-  let data = await search(ctx,'tag')
-  ctx.body = data;
+  ctx.body = await search(ctx,'tag')
 }
+const addArticle = async (ctx,next)=>{
+  const art = mongoose.model('article');
+  let author,title,type,tags,content;
+  
+  ({author,title,type,tags,content} = ctx.request.body)
+  if (author&&title&&type&&content&&tags.length>0){
+    const artilce = new art({
+      author,title,type,tags,content
+    })
+    let data = await artilce.save().then((res)=>{
+      ctx.body = {
+        code:200,
+        msg:'文章添加成功'
+      }
+    }).catch(err=>{
+      ctx.body = {
+        code:410,
+        msg:err
+      }
+    }) 
+  }else{
+    ctx.body = {
+      code:200,
+      msg:'信息不全'
+    }
+  }
+  
+  
+}
+const artList = async(ctx,next)=>{
+  ctx.body = await search(ctx,'article')
+}
+
 module.exports = {
   "GET /addType": addType,
   "GET /typeList": typeList,
   "GET /addTag": addTag,
   "GET /tagList": tagList,
+  "POST /addArticle": addArticle,
+  "GET /artList": artList,
   
-
-
 }

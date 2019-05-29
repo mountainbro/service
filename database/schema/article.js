@@ -5,9 +5,10 @@ const articleSchema = new mongoose.Schema({
     title:String,
     type:String,
     tags:Array,
-    viewCount:Number,
+    content:String,
+    viewCount:{type:Number, default:0},
     likeCount:{type:Number, default:0},
-    createAt:{type:Number, default:0},
+    createAt:{type:Date,default:Date.now()},
     updateAt : {type:Date,default:Date.now()},
 
 },{
