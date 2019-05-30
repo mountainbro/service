@@ -45,14 +45,19 @@ const search = async(ctx,collection)=>{
   var reg = new RegExp(name, 'i');
   let hasNext = (total - size*page)>0?true:false;
   let condition = collection == 'article'? { }:{ name: { '$regex': reg } };
-  let options = collection == 'article'?{ "limit":size,"skip":(page-1)*size}:{ __v: 0 };
-  console.log(options)
-  let data = await coll.find({},options).sort({'_id':-1});
+  // let options = collection == 'article'?{ "limit":size,"skip":(page-1)*size}:{ __v: 0 };
+  
+  let data = await coll.find(condition,{ __v: 0 }).sort({'_id':-1});
+  if (collection == 'article'){
+    data =  await coll.find(condition,{ __v: 0 }).limit(size).skip((page-1)*size).sort({'_id':-1});
+  }
   if (data.length>0) {
     let response = {
       code: 200,
       data,
-      msg: 'success'
+      msg: 'success',
+      // total:total,
+      // hasNext:hasNext,
     };
     // if (collection == 'article'){
     //   response = Object.assign(
