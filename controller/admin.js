@@ -39,35 +39,30 @@ const add = async function (ctx, collection) {
 }
 const search = async(ctx,collection)=>{
   const coll = mongoose.model(collection);
-  let name,sort,page,size;
-  let total = coll.find().count();
-  ({name='',sort='_id',page=1,size=3}=ctx.query)
+  let name,order,page,size;
+  let total = await coll.estimatedDocumentCount();
+  ({name='',order='_id',page=1,size=3}=ctx.query)
   var reg = new RegExp(name, 'i');
   let hasNext = (total - size*page)>0?true:false;
-  let condition = collection == 'article'? { }:{ name: { '$regex': reg } };
-  // let options = collection == 'article'?{ "limit":size,"skip":(page-1)*size}:{ __v: 0 };
-  
+  let condition = collection == 'article'? {title: { '$regex': reg } }:{ name: { '$regex': reg } };
   let data = await coll.find(condition,{ __v: 0 }).sort({'_id':-1});
+  let art = {}
   if (collection == 'article'){
-    data =  await coll.find(condition,{ __v: 0 }).limit(size).skip((page-1)*size).sort({'_id':-1});
+    data =  await coll.find(condition,{ __v: 0 }).sort({order:-1}).limit(+size).skip((+page-1)*size);
+    art = {
+      total:total,
+      hasNext:hasNext,
+    }
   }
   if (data.length>0) {
-    let response = {
-      code: 200,
-      data,
-      msg: 'success',
-      // total:total,
-      // hasNext:hasNext,
-    };
-    // if (collection == 'article'){
-    //   response = Object.assign(
-    //     response
-    //     ,{
-    //       hasNext,
-    //       total
-    //     }
-    //   )
-    // }
+    let response = Object.assign(
+      {
+        code: 200,
+        msg: 'success',
+        data,
+      },
+      art
+    );
     return response
   } else {
     return {

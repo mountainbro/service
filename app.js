@@ -23,7 +23,7 @@ app.use(cors({
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Custom-Header', 'anonymous'],
 }));
 
-app.use(bodyparser()).use(router())
+app.use(bodyparser()).use(check).use(router())
 
 app.listen(6446,()=>{
     console.log('port is at 6446')
