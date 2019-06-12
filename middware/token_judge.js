@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');  //用来生成token
 async function check(ctx,next){
     let url = ctx.url.match(/\/(\w)*\?/);
     url = url?url[0].slice(0,-1):ctx.request.url;
-    let pageArr = ["/login","/register","/qiniuToken","/artList","/",'/typeList'];
+    let pageArr = ["/login","/register","/qiniuToken","/artList","/",'/typeList',"/tagList","/novel"];
     if (pageArr.includes(url)) {
         console.log('不用权限')
         await next()
